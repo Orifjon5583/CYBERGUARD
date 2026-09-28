@@ -209,24 +209,48 @@ fun AdminScreen(viewModel: MainViewModel) {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Simulated Keypad buttons row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0").take(6).forEach { num ->
-                            IconButton(
-                                onClick = { viewModel.updatePinInput(num) },
-                                modifier = Modifier.size(36.dp)
-                            ) {
-                                Text(text = num, color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    // Full 0-9 Keypad buttons grid
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            listOf("1", "2", "3", "4", "5").forEach { num ->
+                                IconButton(
+                                    onClick = { viewModel.updatePinInput(num) },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF162534))
+                                ) {
+                                    Text(text = num, color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
-                        IconButton(
-                            onClick = { viewModel.clearPin() },
-                            modifier = Modifier.size(36.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Icon(imageVector = Icons.Default.Backspace, contentDescription = null, tint = AlertRed, modifier = Modifier.size(18.dp))
+                            listOf("6", "7", "8", "9", "0").forEach { num ->
+                                IconButton(
+                                    onClick = { viewModel.updatePinInput(num) },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF162534))
+                                ) {
+                                    Text(text = num, color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                            IconButton(
+                                onClick = { viewModel.clearPin() },
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(AlertRedBg)
+                            ) {
+                                Icon(imageVector = Icons.Default.Backspace, contentDescription = null, tint = AlertRed, modifier = Modifier.size(18.dp))
+                            }
                         }
                     }
 
