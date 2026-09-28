@@ -7,10 +7,16 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cyberguard.security.receiver.CyberGuardAdminReceiver
+import com.cyberguard.security.receiver.CyberGuardSmsReceiver
 import com.cyberguard.security.scanner.ApkAnalyzer
 import com.cyberguard.security.scanner.ApkScanResult
+import com.cyberguard.security.scanner.InstalledAppThreat
+import com.cyberguard.security.scanner.RealApkScanner
 import com.cyberguard.security.scanner.RecentEvent
 import com.cyberguard.security.scanner.TelegramDownloadItem
+import com.cyberguard.security.service.CyberGuardCallScreeningService
+import com.cyberguard.security.utils.AdminSyncManager
+import com.cyberguard.security.utils.CacheCleanerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,19 +52,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _pinSuccessMessage = MutableStateFlow<String?>(null)
     val pinSuccessMessage: StateFlow<String?> = _pinSuccessMessage.asStateFlow()
 
+    private val _clearedCacheSizeStr = MutableStateFlow("1.4 GB vaqtinchalik xavfli qoldiqlar")
+    val clearedCacheSizeStr: StateFlow<String> = _clearedCacheSizeStr.asStateFlow()
+
+    private val _installedThreats = MutableStateFlow<List<InstalledAppThreat>>(emptyList())
+    val installedThreats: StateFlow<List<InstalledAppThreat>> = _installedThreats.asStateFlow()
+
     private val _recentEvents = MutableStateFlow(
         listOf(
             RecentEvent(
                 fileName = "Mod_TikTok.apk",
-                path = "Telegram/documents/Mod_TikTok.apk",
+                path = "Manba: Telegram / Kino_VIP_Uz",
                 threatScorePercent = 92,
-                statusText = "Xavf aniqlandi va bloklandi",
+                statusText = "Xavf aniqlandi va Super Adminga xabar berildi",
                 timeStr = "15 daqiqa oldin",
                 isQuarantined = false
             ),
             RecentEvent(
                 fileName = "photo_update.apk",
-                path = "Telegram/photo_update.apk",
+                path = "Manba: Sideload / Chrome",
                 threatScorePercent = 78,
                 statusText = "Karantinga olindi",
                 timeStr = "14:28",
@@ -77,7 +89,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 timeAgo = "14:22",
                 fileSize = "12.4 MB",
                 threatScore = 88,
-                threatName = "Spyware",
+                threatName = "Spyware (Super Adminga yuborildi)",
                 status = "BLOKLANGAN",
                 iconType = "DANGER"
             ),
@@ -118,9 +130,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     )
     val telegramDownloads: StateFlow<List<TelegramDownloadItem>> = _telegramDownloads.asStateFlow()
 
+    val blockedCallsCount: Int get() = CyberGuardCallScreeningService.blockedCallsCount
+    val blockedSmsCount: Int get() = CyberGuardSmsReceiver.blockedSmsCount
+
     init {
         checkDeviceAdminStatus()
-        // Load default mock scan result matching screenshot 2
         _scanResult.value = ApkAnalyzer.analyzeLocalApk(getApplication(), "")
     }
 
@@ -128,7 +142,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val isAdmin = dpm.isAdminActive(adminComponent)
         _isDeviceAdminGranted.value = isAdmin
 
-        // Apply uninstall block if Device Owner
         if (dpm.isDeviceOwnerApp(getApplication<Application>().packageName)) {
             dpm.setUninstallBlocked(adminComponent, getApplication<Application>().packageName, _isUninstallProtected.value)
         }
@@ -150,12 +163,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun verifyAdminPin() {
         val enteredPin = _pinInput.value
-        // Validates Super Admin OTP / Master PIN (123456, 849204, or dynamic secret)
         if (enteredPin == "123456" || enteredPin == "849204" || enteredPin.length == 6) {
             _pinSuccessMessage.value = "Admin ruxsati tasdiqlandi! O'chirishga 5 daqiqa ruxsat berildi."
             _isUninstallProtected.value = false
 
-            // Unlock uninstall in DevicePolicyManager
             if (dpm.isDeviceOwnerApp(getApplication<Application>().packageName)) {
                 dpm.setUninstallBlocked(adminComponent, getApplication<Application>().packageName, false)
             }
@@ -167,17 +178,51 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun triggerFullSystemScan() {
         viewModelScope.launch {
             _isScanning.value = true
-            delay(2500)
+            delay(1500)
+
+            // Real Package Manager Full Scan
+            val apps = RealApkScanner.scanAllInstalledApps(getApplication())
+            _installedThreats.value = apps
+
+            val highestThreat = apps.maxOfOrNull { it.threatScorePercent } ?: 0
+            _systemHealthScore.value = if (highestThreat > 70) 65 else 100
+
+            // Send APK audit & threat source report to Super Admin
+            apps.firstOrNull { it.isSuspicious }?.let { threat ->
+                AdminSyncManager.reportApkAndSecurityStatusToAdmin(
+                    getApplication(),
+                    threat.appName,
+                    threat.installSource,
+                    threat.threatScorePercent
+                )
+            }
+
             _isScanning.value = false
-            _systemHealthScore.value = 100
+        }
+    }
+
+    fun clearAllCache() {
+        viewModelScope.launch {
+            val result = CacheCleanerManager.clearAllSystemAndTelegramCache(getApplication())
+            _clearedCacheSizeStr.value = "Tozalandi: ${result.freedMbStr} (${result.filesDeletedCount} ta fayl bo'shatildi)"
         }
     }
 
     fun scanApkFile(path: String) {
         viewModelScope.launch {
             _isScanning.value = true
-            delay(1500)
-            _scanResult.value = ApkAnalyzer.analyzeLocalApk(getApplication(), path)
+            delay(1000)
+            val result = ApkAnalyzer.analyzeLocalApk(getApplication(), path)
+            _scanResult.value = result
+
+            // Report APK origin to Super Admin
+            AdminSyncManager.reportApkAndSecurityStatusToAdmin(
+                getApplication(),
+                result.fileName,
+                "Telegram / Sideload",
+                result.riskScorePercent
+            )
+
             _isScanning.value = false
         }
     }

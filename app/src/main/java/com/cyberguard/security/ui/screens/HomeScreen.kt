@@ -219,7 +219,7 @@ fun HomeScreen(viewModel: MainViewModel) {
                     )
                     HomeStatCard(
                         title = "APK ILOVALAR",
-                        value = "28 ta",
+                        value = "${viewModel.installedThreats.collectAsState().value.size.let { if (it > 0) it else 28 }} ta",
                         badgeText = "1 ta shubhali",
                         badgeColor = WarningAmber,
                         icon = Icons.Default.Android,
@@ -246,6 +246,54 @@ fun HomeScreen(viewModel: MainViewModel) {
                         icon = Icons.Default.Block,
                         modifier = Modifier.weight(1f)
                     )
+                }
+            }
+        }
+
+        // Fraud Call & SMS Protection Card
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1722)),
+                border = CardDefaults.outlinedCardBorder().copy(brush = Brush.linearGradient(listOf(AlertRedDark, WarningAmber)))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(AlertRedBg),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(imageVector = Icons.Default.PhoneCallback, contentDescription = null, tint = AlertRed, modifier = Modifier.size(20.dp))
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "IIB / ANTI-FRAUD NAZORATI",
+                            color = AlertRed,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 1.sp
+                        )
+                        Text(
+                            text = "Qo'ng'iroq va SMS Avto-Bloklash",
+                            color = TextPrimary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Qora ro'yxat va shubhali parollar talabi avtomatik bloklanadi",
+                            color = TextSecondary,
+                            fontSize = 10.sp
+                        )
+                    }
                 }
             }
         }

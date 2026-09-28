@@ -310,6 +310,8 @@ fun TelegramScreen(viewModel: MainViewModel) {
 
         // Telegram Cache Cleanup Card
         item {
+            val cacheText by viewModel.clearedCacheSizeStr.collectAsState()
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -336,12 +338,12 @@ fun TelegramScreen(viewModel: MainViewModel) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(text = "Telegram Keshini Tozalash", color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                            Text(text = "1.4 GB vaqtinchalik xavfli qoldiqlar", color = TextSecondary, fontSize = 10.sp)
+                            Text(text = cacheText, color = TextSecondary, fontSize = 10.sp)
                         }
                     }
 
                     Button(
-                        onClick = { },
+                        onClick = { viewModel.clearAllCache() },
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = NeonCyan)
                     ) {
