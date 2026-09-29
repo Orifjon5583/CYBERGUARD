@@ -450,7 +450,7 @@ fun TelegramDownloadCard(item: TelegramDownloadItem) {
             if (item.threatScore > 0) {
                 Spacer(modifier = Modifier.height(4.dp))
                 LinearProgressIndicator(
-                    progress = { item.threatScore / 100f },
+                    progress = item.threatScore / 100f,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp)

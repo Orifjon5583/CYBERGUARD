@@ -288,7 +288,7 @@ fun ApkDetailResultCard(result: ApkScanResult) {
             }
             Spacer(modifier = Modifier.height(6.dp))
             LinearProgressIndicator(
-                progress = { 59f / 71f },
+                progress = 59f / 71f,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(6.dp)
