@@ -373,6 +373,85 @@ fun AdminScreen(viewModel: MainViewModel) {
                 }
             }
         }
+
+        // Author & About App Footer
+        item {
+            var showAboutDialog by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+
+            if (showAboutDialog) {
+                AlertDialog(
+                    onDismissRequest = { showAboutDialog = false },
+                    confirmButton = {
+                        Button(
+                            onClick = { showAboutDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = NeonCyan)
+                        ) {
+                            Text(text = "Yopish", color = CyberDarkBg, fontWeight = FontWeight.Bold)
+                        }
+                    },
+                    containerColor = CyberCardBg,
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Default.Security, contentDescription = null, tint = NeonCyan, modifier = Modifier.size(24.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = "CYBERGUARD Security", color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        }
+                    },
+                    text = {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(text = "📌 Yaratuvchi: Kenjaboyev Orifjon", color = NeonCyan, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(text = "⏱ Yaratilgan sana va vaqt: 2026-09-29 09:37:40", color = TextSecondary, fontSize = 11.sp)
+                            Text(text = "📦 Ilova Versiyasi: v1.0.0 (Build 2026.09.29)", color = TextSecondary, fontSize = 11.sp)
+                            Divider(color = CyberCardBorder, modifier = Modifier.padding(vertical = 4.dp))
+                            Text(text = "🛠 Asosiy Funksiyalar va Imkoniyatlar:", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(text = "• 🔒 Device Owner & Uninstall Blocking (MDM qat'iy himoya)", color = TextSecondary, fontSize = 11.sp)
+                            Text(text = "• 🔍 Telefoni va APK fayllarni to'liq real skanerlash", color = TextSecondary, fontSize = 11.sp)
+                            Text(text = "• 📡 APK manbasini (Telegram, Chrome) Super Adminga yetkazish", color = TextSecondary, fontSize = 11.sp)
+                            Text(text = "• 📞 Firibgarlik qo'ng'iroqlari va USSD kodlarni avto-bloklash", color = TextSecondary, fontSize = 11.sp)
+                            Text(text = "• 💬 SMS OTP va phishing xavflardan avtomatik himoya", color = TextSecondary, fontSize = 11.sp)
+                            Text(text = "• 🧹 Telegram va tizim keshini bir bosishda tozalash", color = TextSecondary, fontSize = 11.sp)
+                        }
+                    }
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(
+                    onClick = { showAboutDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B2B3A))
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Default.Info, contentDescription = null, tint = NeonCyan, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(text = "Ilova Haqida To'liq Ma'lumot", color = NeonCyan, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Yaratuvchi: Kenjaboyev Orifjon",
+                    color = TextPrimary,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "CYBERGUARD Security & MDM Engine • 2026",
+                    color = TextSecondary,
+                    fontSize = 11.sp
+                )
+            }
+        }
     }
 }
 
