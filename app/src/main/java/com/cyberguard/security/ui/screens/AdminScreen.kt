@@ -405,7 +405,7 @@ fun AdminScreen(viewModel: MainViewModel) {
                             Text(text = "📌 Yaratuvchi: Kenjaboyev Orifjon", color = NeonCyan, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             Text(text = "⏱ Yaratilgan sana va vaqt: 2026-09-29 09:37:40", color = TextSecondary, fontSize = 11.sp)
                             Text(text = "📦 Ilova Versiyasi: v1.0.0 (Build 2026.09.29)", color = TextSecondary, fontSize = 11.sp)
-                            Divider(color = CyberCardBorder, modifier = Modifier.padding(vertical = 4.dp))
+                            Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(CyberCardBorder).padding(vertical = 4.dp))
                             Text(text = "🛠 Asosiy Funksiyalar va Imkoniyatlar:", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             Text(text = "• 🔒 Device Owner & Uninstall Blocking (MDM qat'iy himoya)", color = TextSecondary, fontSize = 11.sp)
                             Text(text = "• 🔍 Telefoni va APK fayllarni to'liq real skanerlash", color = TextSecondary, fontSize = 11.sp)
